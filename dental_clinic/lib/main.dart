@@ -1,121 +1,61 @@
+import 'package:dental_clinic/bloc_observer.dart';
+import 'package:dental_clinic/features/presentation/pages/login/bloc/register_bloc.dart';
+import 'package:dental_clinic/features/presentation/routes/router.gr.dart'
+    as app_router;
+import 'package:dental_clinic/features/presentation/styles.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'src/authentication.dart';
-import 'src/models/app_state_model.dart';
+import 'features/presentation/pages/appointment/bloc/appointment_form_bloc.dart';
+import 'features/presentation/pages/home/bloc/recent_appointment_bloc.dart';
+import 'features/presentation/pages/home/bloc/weather_bloc.dart';
+import 'features/presentation/pages/login/bloc/authentication_bloc.dart';
+import 'features/presentation/pages/login/bloc/login_bloc.dart';
+import 'injection_container.dart' as di;
+import 'injection_container.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => ApplicationState(),
-    builder: (context, _) => App(),
-  ));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
+  await Firebase.initializeApp();
+  Bloc.observer = AppBlocObserver();
+  runApp(App());
 }
 
 class App extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Dental Clinic',
-      theme: ThemeData(
-          buttonTheme: Theme.of(context)
-              .buttonTheme
-              .copyWith(highlightColor: Colors.greenAccent),
-          primarySwatch: Colors.green,
-          textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
-          visualDensity: VisualDensity.adaptivePlatformDensity),
-      home: HomePage(),
-    );
-  }
-}
+  final _appRouter = app_router.AppRouter();
 
-class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Dental Clinic'),
-        actions: <Widget>[
-          Consumer<ApplicationState>(
-            builder: (context, appState, _) => _buildAppbarActions(context, appState),
-          )
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (_) => sl<AuthenticationBloc>()..add(AppStarted())),
+          BlocProvider(create: (_) => sl<WeatherBloc>()),
+          BlocProvider(create: (_) => sl<AppointmentFormBloc>()),
+          BlocProvider(create: (_) => sl<RecentAppointmentBloc>()),
+          BlocProvider(create: (_) => sl<LoginBloc>()),
+          BlocProvider(create: (_) => sl<RegisterBloc>())
         ],
-      ),
-      body: ListView(
-        children: <Widget>[
-          Image.asset('assets/dental_clinic.jpg'),
-          SizedBox(height: 8),
-          Consumer<ApplicationState>(
-              builder: (context, appState, _) => Authentication(
-                  loginState: appState.loginState,
-                  email: appState.email,
-                  startLoginFlow: appState.startLoginFlow,
-                  verifyEmail: appState.verifyEmail,
-                  signInWithEmailAndPassword:
-                      appState.signInWithEmailAndPassword,
-                  cancelRegistration: appState.cancelRegistration,
-                  registerAccount: appState.registerAccount,
-                  signOut: appState.signOut)),
-        ],
-      ),
-      floatingActionButton: Consumer<ApplicationState>(
-        builder: (context, appState, _) => FloatingActionButton.extended(
-            onPressed: () => _makeAppointment(context, appState),
-            label: Text('Appointment'),
-            icon: Icon(Icons.calendar_today_outlined)),
-      ),
-    );
-  }
+        child: MaterialApp(
+          title: 'Dental Clinic',
+          theme: Styles.primaryTheme(context),
+          home: MaterialApp.router(
+              routeInformationParser: _appRouter.defaultRouteParser(),
+              routerDelegate: _appRouter.delegate()),
+        ));
 
-  void _makeAppointment(BuildContext context, ApplicationState appState) {
-    if (appState.loginState == ApplicationLoginState.loggedIn) {
-      Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (context) => MakeAppointmentDialog(),
-          fullscreenDialog: true));
-    } else {}
-  }
-}
-
-Widget _buildAppbarActions(BuildContext context, ApplicationState appState) {
-  if (appState.loginState == ApplicationLoginState.loggedIn) {
-    return IconButton(
-        icon: Icon(Icons.logout),
-        onPressed: () => {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                        title: Text('Logout'),
-                        content: Text(
-                            'Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {},
-                            child: Text('Remain Signed In'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              appState.signOut();
-                            },
-                            child: Text('Yes, Logout'),
-                          ),
-                        ],
-                      ))
-            });
-  } else {
-    return Container();
-  }
-}
-
-class MakeAppointmentDialog extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Make Appointment'),
-      ),
-      body: Center(
-        child: Text('Appointment form'),
-      ),
-    );
+    // return MultiProvider(
+    //     providers: [
+    //       ChangeNotifierProvider.value(value: ApplicationState()),
+    //     ],
+    //     child: MaterialApp(
+    //       title: 'Dental Clinic',
+    //       theme: Styles.primaryTheme(context),
+    //       home: MaterialApp.router(
+    //           routeInformationParser: _appRouter.defaultRouteParser(),
+    //           routerDelegate: _appRouter.delegate()),
+    //     ));
   }
 }
