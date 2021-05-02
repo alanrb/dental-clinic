@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dental_clinic/features/data/utils/firestore_utils.dart';
 import 'package:dental_clinic/core/error/failures.dart';
 import 'package:dental_clinic/core/network/network_info.dart';
 import 'package:dental_clinic/features/domain/model/user_model.dart';
@@ -7,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class UserRepositoryFirebaseImpl implements UserRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   final NetworkInfo networkInfo;
 
   UserRepositoryFirebaseImpl(this.networkInfo);
@@ -48,6 +51,14 @@ class UserRepositoryFirebaseImpl implements UserRepository {
       var credential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
       await credential.user!.updateProfile(displayName: fullName);
+
+      await _fireStore.userCollection.add({
+        'userId': credential.user!.uid,
+        'email': email,
+        'role': 0,
+        'fullName': fullName,
+        'lastUpdate': DateTime.now().millisecondsSinceEpoch
+      });
 
       return right(UserModel(
           userId: credential.user!.uid,

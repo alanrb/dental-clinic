@@ -7,6 +7,8 @@ extension AppFireStore on FirebaseFirestore {
 
   CollectionReference get doctorCollection => collection('doctor');
 
+  CollectionReference get userCollection => collection('user');
+
   CollectionReference get appointmentCollection => collection('appointment');
 
   Future<DocumentReference> branchDocument(String id) async {
