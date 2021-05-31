@@ -22,7 +22,6 @@ class _SelectDoctorWidgetState extends State<SelectDoctorWidget> {
     return Stack(
       children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Header('Select Doctor'),
           Padding(
             padding: Styles.space_m,
             child: Form(
@@ -30,8 +29,9 @@ class _SelectDoctorWidgetState extends State<SelectDoctorWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Card(child: _buildListCases(widget.doctors)),
+                  const Header('Select Doctor'),
                   SizedBox(height: Styles.space_m.bottom),
+                  Card(child: _buildListCases(widget.doctors)),
                 ],
               ),
             ),

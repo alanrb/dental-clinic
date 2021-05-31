@@ -18,6 +18,11 @@ abstract class AppointmentFormState extends Equatable {
 }
 
 class Initial extends AppointmentFormState {
+
+  final String? userId;
+
+  Initial(this.userId);
+
   @override
   List<Object> get props => [];
 }
@@ -48,6 +53,7 @@ class DoctorLoaded extends AppointmentFormState {
 }
 
 class AppointmentForm extends AppointmentFormState {
+
   @override
   List<Object> get props => [];
 }

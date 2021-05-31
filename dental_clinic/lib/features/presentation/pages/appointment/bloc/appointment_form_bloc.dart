@@ -10,6 +10,7 @@ import 'package:dental_clinic/features/domain/model/issue_case_model.dart';
 import 'package:dental_clinic/features/domain/usecases/create_appointment_usecase.dart';
 import 'package:dental_clinic/features/domain/usecases/get_doctor_usecase.dart';
 import 'package:dental_clinic/features/domain/usecases/get_issue_case_usecase.dart';
+import 'package:dental_clinic/features/domain/usecases/user/get_user_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'appointment_form_event.dart';
@@ -21,20 +22,27 @@ class AppointmentFormBloc
   final GetIssueCaseUseCase getIssueCaseUseCase;
   final GetDoctorUseCase getDoctorUseCase;
   final AddAppointmentUseCase addUseCase;
+  final GetUserUseCase getUserUseCase;
 
   StreamSubscription<Either<Failure, List<IssueCaseModel>>>?
       _casesStreamSubscription;
   StreamSubscription<Either<Failure, List<DoctorModel>>>?
       _doctorStreamSubscription;
 
-  AppointmentFormBloc(
-      this.getIssueCaseUseCase, this.getDoctorUseCase, this.addUseCase)
-      : super(Initial());
+  AppointmentFormBloc(this.getUserUseCase, this.getIssueCaseUseCase,
+      this.getDoctorUseCase, this.addUseCase)
+      : super(Initial(null));
 
   @override
   Stream<AppointmentFormState> mapEventToState(
     AppointmentFormEvent event,
   ) async* {
+    if (event is LoadUser) {
+      final failureOrResult = await getUserUseCase(NoParams());
+      yield failureOrResult.fold(
+          (failure) => Initial(null), (user) => Initial(user.userId));
+    }
+
     if (event is LoadCases) {
       _casesStreamSubscription?.cancel();
       _casesStreamSubscription =

@@ -109,7 +109,8 @@ extension AppointmentFirebaseDto on AppointmentModel {
       'time': time,
       'branch': branch,
       'note': note ?? '',
-      'timestamp': DateTime.now().millisecondsSinceEpoch
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+      'updatedAt': DateTime.now().millisecondsSinceEpoch
     };
   }
 }

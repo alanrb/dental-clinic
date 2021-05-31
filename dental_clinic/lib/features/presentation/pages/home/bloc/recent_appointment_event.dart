@@ -1,13 +1,10 @@
 part of 'recent_appointment_bloc.dart';
 
-abstract class RecentAppointmentEvent extends Equatable {
-}
+abstract class RecentAppointmentEvent extends Equatable {}
 
 class LoadRecent extends RecentAppointmentEvent {
+  LoadRecent();
 
-  final String userId;
-
-  LoadRecent(this.userId);
   @override
   List<Object?> get props => [];
 }

@@ -69,8 +69,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    SizedBox(height: Styles.space_m.top),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: TextFormField(
                         controller: _emailController,
                         decoration: const InputDecoration(
@@ -85,7 +86,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: TextFormField(
                         controller: _fullNameController,
                         decoration: const InputDecoration(
@@ -102,7 +103,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: TextFormField(
                         controller: _passwordController,
                         decoration: const InputDecoration(
@@ -119,23 +120,19 @@ class _RegisterFormState extends State<RegisterForm> {
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          StyledButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate() &&
-                                  isRegisterButtonEnabled(state)) {
-                                _onFormSubmitted();
-                              }
-                            },
-                            child: Text('SAVE'),
-                            isLoading: state.isSubmitting,
-                          ),
-                          SizedBox(width: 30),
-                        ],
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: Styles.space,
+                      width: double.infinity,
+                      child: StyledButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate() &&
+                              isRegisterButtonEnabled(state)) {
+                            _onFormSubmitted();
+                          }
+                        },
+                        child: Text('SUBMIT'),
+                        isLoading: state.isSubmitting,
                       ),
                     ),
                   ],

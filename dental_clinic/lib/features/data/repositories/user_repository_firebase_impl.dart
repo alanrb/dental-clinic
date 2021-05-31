@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:dental_clinic/features/data/utils/firestore_utils.dart';
 import 'package:dental_clinic/core/error/failures.dart';
 import 'package:dental_clinic/core/network/network_info.dart';
+import 'package:dental_clinic/features/data/utils/firestore_utils.dart';
 import 'package:dental_clinic/features/domain/model/user_model.dart';
+import 'package:dental_clinic/features/domain/model/user_type.dart';
 import 'package:dental_clinic/features/domain/repositories/user_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -20,12 +21,20 @@ class UserRepositoryFirebaseImpl implements UserRepository {
     if (currentUser == null) {
       return left(ServerFailure());
     }
-    return right(UserModel(
-        userId: currentUser.uid,
-        role: 1,
-        displayName: currentUser.displayName,
-        email: currentUser.email,
-        phoneNumber: currentUser.phoneNumber));
+
+    final userSnapshot =
+        await _fireStore.userCollection.doc(currentUser.uid).get();
+
+    if (userSnapshot.exists) {
+      return right(UserModel(
+          userId: currentUser.uid,
+          role: UserRoleId.parse(userSnapshot.data()!['role']),
+          displayName: currentUser.displayName,
+          email: currentUser.email,
+          phoneNumber: currentUser.phoneNumber));
+    } else {
+      return left(ServerFailure());
+    }
   }
 
   @override
@@ -38,7 +47,7 @@ class UserRepositoryFirebaseImpl implements UserRepository {
     }
     return right(UserModel(
         userId: firebaseUser.user!.uid,
-        role: 1,
+        role: UserRole.user,
         displayName: firebaseUser.user!.displayName,
         email: firebaseUser.user!.email,
         phoneNumber: firebaseUser.user!.phoneNumber));
@@ -52,17 +61,18 @@ class UserRepositoryFirebaseImpl implements UserRepository {
           email: email, password: password);
       await credential.user!.updateProfile(displayName: fullName);
 
-      await _fireStore.userCollection.add({
+      await _fireStore.userCollection.doc(credential.user!.uid).set({
         'userId': credential.user!.uid,
         'email': email,
-        'role': 0,
+        'role': UserRole.user.toId(),
         'fullName': fullName,
-        'lastUpdate': DateTime.now().millisecondsSinceEpoch
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+        'updatedAt': DateTime.now().millisecondsSinceEpoch
       });
 
       return right(UserModel(
           userId: credential.user!.uid,
-          role: 1,
+          role: UserRole.user,
           displayName: credential.user!.displayName,
           email: credential.user!.email,
           phoneNumber: credential.user!.phoneNumber));

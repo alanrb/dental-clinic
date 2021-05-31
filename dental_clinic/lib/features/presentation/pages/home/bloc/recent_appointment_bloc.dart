@@ -3,38 +3,54 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dental_clinic/core/error/failures.dart';
+import 'package:dental_clinic/core/usecases/usecase.dart';
 import 'package:dental_clinic/features/domain/model/appointment_model.dart';
 import 'package:dental_clinic/features/domain/usecases/get_user_appointment_usecase.dart';
+import 'package:dental_clinic/features/domain/usecases/user/get_user_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'recent_appointment_event.dart';
+
 part 'recent_appointment_state.dart';
 
-class RecentAppointmentBloc extends Bloc<RecentAppointmentEvent, RecentAppointmentState> {
-
+class RecentAppointmentBloc
+    extends Bloc<RecentAppointmentEvent, RecentAppointmentState> {
+  final GetUserUseCase getUserUseCase;
   final GetUserAppointmentUseCase getUserAppointmentUseCase;
 
   StreamSubscription<Either<Failure, List<AppointmentModel>>>?
-  _appointmentStreamSubscription;
+      _appointmentStreamSubscription;
 
-  RecentAppointmentBloc(this.getUserAppointmentUseCase) : super(Initial());
+  RecentAppointmentBloc(this.getUserUseCase, this.getUserAppointmentUseCase)
+      : super(Initial());
 
   @override
   Stream<RecentAppointmentState> mapEventToState(
     RecentAppointmentEvent event,
   ) async* {
     if (event is LoadRecent) {
-      _appointmentStreamSubscription?.cancel();
-      _appointmentStreamSubscription = getUserAppointmentUseCase(event.userId).listen((event) {
-        add(Received(event));
-      });
+      final failureOrResult = await getUserUseCase(NoParams());
+      failureOrResult.fold((failure) => _mapUserToFailure(failure),
+          (user) => _mapUserToAppointment(user.userId));
     }
 
-    if(event is Received) {
+    if (event is Received) {
       yield event.model.fold(
-              (failure) => AppointmentLoaded([], _mapFailureToMessage(failure)),
-              (doctors) => AppointmentLoaded(doctors, null));
+          (failure) => AppointmentLoaded([], _mapFailureToMessage(failure)),
+          (doctors) => AppointmentLoaded(doctors, null));
     }
+  }
+
+  _mapUserToFailure(Failure failure) async* {
+    yield AppointmentLoaded([], _mapFailureToMessage(failure));
+  }
+
+  _mapUserToAppointment(String userId) {
+    _appointmentStreamSubscription?.cancel();
+    _appointmentStreamSubscription =
+        getUserAppointmentUseCase(userId).listen((event) {
+      add(Received(event));
+    });
   }
 
   @override

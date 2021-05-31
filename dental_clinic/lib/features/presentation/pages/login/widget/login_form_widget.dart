@@ -60,7 +60,6 @@ class _LoginFormState extends State<LoginForm> {
             builder: (context, state) {
               return Column(
                 children: [
-                  Header('Sign in'),
                   Padding(
                     padding: Styles.space_m,
                     child: Form(
@@ -100,10 +99,10 @@ class _LoginFormState extends State<LoginForm> {
                             },
                           ),
                           SizedBox(height: Styles.space_m.top),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              StyledButton(
+                          Container(
+                              margin: const EdgeInsets.symmetric(vertical: 16),
+                              width: double.infinity,
+                              child: StyledButton(
                                 onPressed: () {
                                   if (_formKey.currentState!.validate() &&
                                       isLoginButtonEnabled(state)) {
@@ -112,9 +111,10 @@ class _LoginFormState extends State<LoginForm> {
                                 },
                                 isLoading: state.isSubmitting,
                                 child: Text('SIGN IN'),
-                              ),
-                              CreateAccountButton()
-                            ],
+                              )),
+                          Container(
+                            width: double.infinity,
+                            child: CreateAccountButton(),
                           )
                         ],
                       ),

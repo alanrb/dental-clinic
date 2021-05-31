@@ -22,7 +22,7 @@ class _SelectDateTimeWidgetState extends State<SelectDateTimeWidget> {
     return Stack(
       children: [
         ListView(children: [
-          Header('Select Time'),
+          Padding(padding: Styles.space_m, child: Header('Select Time')),
           TableCalendar(
               firstDay: DateTime.now(),
               lastDay: DateTime.utc(2030, 3, 14),
@@ -50,9 +50,8 @@ class _SelectDateTimeWidgetState extends State<SelectDateTimeWidget> {
                 width: double.infinity,
                 child: StyledButton(
                   onPressed: () => {
-                    if (_selectedDay != null) {
-                      widget.onTimeSelected(_selectedDay!)
-                    }
+                    if (_selectedDay != null)
+                      {widget.onTimeSelected(_selectedDay!)}
                   },
                   child: Text('NEXT'),
                 )))

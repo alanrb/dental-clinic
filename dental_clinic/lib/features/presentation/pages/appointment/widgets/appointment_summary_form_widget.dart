@@ -9,11 +9,13 @@ import 'package:intl/intl.dart';
 
 class AppointmentSummaryFormWidget extends StatefulWidget {
   AppointmentSummaryFormWidget(
-      {required this.issue,
+      {required this.userId,
+      required this.issue,
       required this.dateTime,
       required this.doctor,
       required this.onSubmitFormSuccess});
 
+  final String userId;
   final DateTime dateTime;
   final IssueCaseModel issue;
   final DoctorModel doctor;
@@ -114,9 +116,7 @@ class _AppointmentSummaryFormWidgetState
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-              title: Text('Lim Cook'),
-              subtitle: Text('Patient')),
+          ListTile(title: Text('Lim Cook'), subtitle: Text('Patient')),
           Divider(height: 1, color: Styles.rowDivider),
           Container(
               padding: Styles.space_m,
@@ -164,17 +164,24 @@ class _AppointmentSummaryFormWidgetState
       if (state is AppointmentAdded) {
         return const Text('Appointment added');
       }
-      if (state is AppointmentForm || state is Initial || state is Loading) {
+      if (state is AppointmentForm) {
         return StyledButton(
           onPressed: () => {
             context.read<AppointmentFormBloc>().add(SubmitAppointment(
-                user: 'user1',
+                user: widget.userId,
                 issueId: widget.issue.id,
                 issueTitle: widget.issue.title,
                 time: widget.dateTime.millisecondsSinceEpoch,
                 doctor: widget.doctor,
                 note: _textController.text))
           },
+          child: Text('SUBMIT APPOINTMENT'),
+          isLoading: state is Loading,
+        );
+      }
+      if (state is Initial || state is Loading) {
+        return StyledButton(
+          onPressed: () => {},
           child: Text('SUBMIT APPOINTMENT'),
           isLoading: state is Loading,
         );

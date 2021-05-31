@@ -2,6 +2,11 @@ part of 'appointment_form_bloc.dart';
 
 abstract class AppointmentFormEvent extends Equatable {}
 
+class LoadUser extends AppointmentFormEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 class LoadCases extends AppointmentFormEvent {
   @override
   List<Object?> get props => [];

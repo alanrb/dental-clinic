@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     BlocProvider.of<WeatherBloc>(context).add(GetWeatherByCity('Ho Chi Minh'));
-    BlocProvider.of<RecentAppointmentBloc>(context).add(LoadRecent('user1'));
+    BlocProvider.of<RecentAppointmentBloc>(context).add(LoadRecent());
   }
 
   @override

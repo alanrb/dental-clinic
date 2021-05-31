@@ -17,14 +17,15 @@ class MakeAppointmentPage extends StatefulWidget {
 }
 
 class _MakeAppointmentPageState extends State<MakeAppointmentPage> {
-  DateTime? _dateTime;
   IssueCaseModel? _issue;
+  String? _userId;
+  DateTime? _dateTime;
   DoctorModel? _doctor;
 
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<AppointmentFormBloc>(context).add(LoadCases());
+    BlocProvider.of<AppointmentFormBloc>(context).add(LoadUser());
   }
 
   @override
@@ -43,8 +44,7 @@ class _MakeAppointmentPageState extends State<MakeAppointmentPage> {
           leading: IconButton(
               color: Colors.black,
               icon: Icon(Icons.arrow_back_rounded),
-              onPressed: () {
-              })),
+              onPressed: () {})),
       body: SafeArea(child: _buildForm()),
     );
   }
@@ -52,8 +52,12 @@ class _MakeAppointmentPageState extends State<MakeAppointmentPage> {
   Widget _buildForm() {
     return BlocListener<AppointmentFormBloc, AppointmentFormState>(
         listener: (context, state) async {
-      print('BlocListener: $state');
-      if (state is Initial) {}
+      if (state is Initial) {
+        if (state.userId != null && state.userId!.length > 0) {
+          _userId = state.userId;
+          context.read<AppointmentFormBloc>().add(LoadCases());
+        }
+      }
     }, child: BlocBuilder<AppointmentFormBloc, AppointmentFormState>(
             builder: (context, state) {
       if (state is Initial) {
@@ -84,8 +88,12 @@ class _MakeAppointmentPageState extends State<MakeAppointmentPage> {
             doctors: state.doctor);
       }
 
-      if (this._issue != null && _dateTime != null && _doctor != null) {
+      if (_userId != null &&
+          _issue != null &&
+          _dateTime != null &&
+          _doctor != null) {
         return AppointmentSummaryFormWidget(
+            userId: _userId!,
             issue: _issue!,
             dateTime: _dateTime!,
             doctor: _doctor!,

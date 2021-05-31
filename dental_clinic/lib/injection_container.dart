@@ -30,8 +30,8 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // Bloc
   sl.registerFactory(() => WeatherBloc(sl()));
-  sl.registerFactory(() => AppointmentFormBloc(sl(), sl(), sl()));
-  sl.registerFactory(() => RecentAppointmentBloc(sl()));
+  sl.registerFactory(() => AppointmentFormBloc(sl(), sl(), sl(), sl()));
+  sl.registerFactory(() => RecentAppointmentBloc(sl(), sl()));
   sl.registerFactory(() => AuthenticationBloc(sl(), sl()));
   sl.registerFactory(() => LoginBloc(sl()));
   sl.registerFactory(() => RegisterBloc(sl()));

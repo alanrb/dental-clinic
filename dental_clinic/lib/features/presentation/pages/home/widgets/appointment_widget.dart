@@ -15,6 +15,7 @@ class RecentAppointment extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Header('Appointment'),
+        SizedBox(height: Styles.space.bottom),
         Card(child: _buildList(datum)),
         SizedBox(height: Styles.space_l.bottom),
         SizedBox(height: Styles.space_l.bottom),
